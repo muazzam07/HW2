@@ -35,6 +35,54 @@ class MoviesController < ApplicationController
     @movie = Movie.find params[:id]
   end
 
+  def updtmovie
+  end
+  
+  def updtmoviesomething
+    @movie = Movie.find_by_title(params[:movie][:oldTitle])
+    if (@movie.nil?)
+      flash[:notice] = "error!"
+    else
+      if (not (params[:movie][:title] == "" ||  params[:movie][:rating] == '--'))
+        @movie.update_attributes!(params.require(:movie).permit(:title))
+        @movie.update_attributes!(params.require(:movie).permit(:release_date))
+        @movie.update_attributes!(params.require(:movie).permit(:rating))
+        flash[:notice] = "Updated!"
+      else
+        flash[:notice] = "Atleast one field is empty!"
+      end
+      # if (not params[:movie][:release_date].nil?)
+      #   @movie.update_attributes!(params.require(:movie).permit(:release_date))
+      # end
+      # if (params[:movie][:rating] != '--')
+      #   @movie.update_attributes!(params.require(:movie).permit(:rating))
+      # end
+      
+    end
+    redirect_to movies_path
+  end
+  
+  def delmov
+  end
+  
+  def delmovsomething
+    @moviename = Movie.find_by_title(params[:movie][:title])
+    @movierate = Movie.find_by_rating(params[:movie][:rating])
+    
+    if (@moviename.nil? && @movierate.nil?)
+      flash[:notice] = "No movie selected!!"
+    else
+      if (not @moviename.nil?)
+        @moviename.destroy
+      end
+      while not (@movierate.nil?)
+        @movierate.destroy
+        @movierate = Movie.find_by_rating(params[:movie][:rating])
+      end
+    end
+    redirect_to movies_path
+  end
+  
   def update
     @movie = Movie.find params[:id]
     @movie.update_attributes!(movie_params)
