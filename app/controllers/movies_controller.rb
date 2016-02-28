@@ -11,11 +11,23 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all.order(params[:sort_by])
+    @sortvar = params[:sort_by]
+    @movies = Movie.all.order(@sortvar)
+    @checkboxer = params[:ratings] || {'G' => 1, 'PG' => 1, 'PG-13' => 1, 'R' => 1, 'NC-17' => 1}
     
-    if params[:sort_by] == 'title'
+    if @checkboxer.nil?
+      @movies = Movie.where(:rating => @checkboxer.keys).all
+    else
+      if @sortvar.nil?
+          @movies = Movie.where(:rating => @checkboxer.keys).all
+      else
+          @movies = Movie.where(:rating => @checkboxer.keys).order(@sortvar).all
+      end
+    end
+    
+    if @sortvar == 'title'
       @insttitl = 'highlight'
-    elsif params[:sort_by] == 'release_date'
+    elsif @sortvar == 'release_date'
       @instreldate ='highlight'
     end
     
